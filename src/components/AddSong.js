@@ -10,6 +10,7 @@ import {
   makeStyles,
 } from '@material-ui/core';
 import { Link, AddBoxOutlined } from '@material-ui/icons';
+import ReactPlayer from 'react-player';
 import SoundcloudPlayer from 'react-player/lib/players/SoundCloud';
 import YoutubePlayer from 'react-player/lib/players/YouTube';
 
@@ -37,6 +38,12 @@ function AddSong() {
   const [url, setUrl] = React.useState('');
   const [playable, setPlayable] = React.useState(false);
   const [dialog, setDialog] = React.useState(false);
+  const [song, setSong] = React.useState({
+    duration: 0,
+    title: '',
+    artist: '',
+    thumbnail: '',
+  });
 
   React.useEffect(() => {
     const isPlayable =
@@ -48,6 +55,46 @@ function AddSong() {
     setDialog(false);
   }
 
+  async function handleEditSong({ player }) {
+    const nestedPlayer = player.player.player;
+    let songData;
+    if (nestedPlayer.getVideoData) {
+      songData = getYoutubeInfo(nestedPlayer);
+    } else if (nestedPlayer.getCurrentSound) {
+      songData = await getSoundcloudInfo(nestedPlayer);
+    }
+    setSong({ ...songData, url });
+  }
+
+  function getYoutubeInfo(player) {
+    const duration = player.getDuration();
+    const { title, video_id, author } = player.getVideoData();
+    const thumbnail = `http://img.youtube.com/vi/${video_id}/0.jpg`;
+    return {
+      duration,
+      title,
+      artist: author,
+      thumbnail,
+    };
+  }
+
+  function getSoundcloudInfo(player) {
+    return new Promise((resolve) => {
+      player.getCurrentSound((songData) => {
+        if (songData) {
+          resolve({
+            duration: Number(songData.duration / 1000),
+            title: songData.title,
+            artist: songData.user.username,
+            thumbnail: songData.artwork_url.replace('-large', '-t500x500'),
+          });
+        }
+      });
+    });
+  }
+
+  const { thumbnail, title, artist } = song;
+
   return (
     <div className={classes.container}>
       <Dialog
@@ -58,13 +105,26 @@ function AddSong() {
         <DialogTitle>Edit Song</DialogTitle>
         <DialogContent>
           <img
-            src='https://images-na.ssl-images-amazon.com/images/I/71sJcYPgkJL._SY355_.jpg'
+            src={thumbnail}
             alt='Song Thumbnail'
             className={classes.thumbnail}
           />
-          <TextField margin='dense' name='title' label='Title' fullWidth />
-          <TextField margin='dense' name='artist' label='Artist' fullWidth />
           <TextField
+            margin='dense'
+            value={title}
+            name='title'
+            label='Title'
+            fullWidth
+          />
+          <TextField
+            margin='dense'
+            value={artist}
+            name='artist'
+            label='Artist'
+            fullWidth
+          />
+          <TextField
+            value={thumbnail}
             margin='dense'
             name='thumbnail'
             label='Thumbnail'
@@ -106,6 +166,7 @@ function AddSong() {
       >
         Add
       </Button>
+      <ReactPlayer url={url} hidden onReady={handleEditSong} />
     </div>
   );
 }
