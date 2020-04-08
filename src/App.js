@@ -4,13 +4,28 @@ import AddSong from './components/AddSong';
 import SongList from './components/SongList';
 import SongPlayer from './components/SongPlayer';
 import { Grid, useMediaQuery } from '@material-ui/core';
+import songReducer from './reducer';
+
+export const SongContext = React.createContext({
+  song: {
+    id: 'd6f1435b-1bab-476f-8a7e-315e92466fae',
+    title: "It's A Fine Day",
+    artist: 'ATB',
+    thumbnail: 'http://img.youtube.com/vi/Ccs6QZezxrU/0.jpg',
+    url: 'https://www.youtube.com/watch?v=Ccs6QZezxrU',
+    duration: 373,
+  },
+  isPlaying: false,
+});
 
 function App() {
-  const greaterThanSm = useMediaQuery(theme => theme.breakpoints.up('sm'));
-  const greaterThanMd = useMediaQuery(theme => theme.breakpoints.up('md'));
+  const initialSongState = React.useContext(SongContext);
+  const [state, dispatch] = React.useReducer(songReducer, initialSongState);
+  const greaterThanSm = useMediaQuery((theme) => theme.breakpoints.up('sm'));
+  const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
   return (
-    <>
+    <SongContext.Provider value={{ state, dispatch }}>
       {greaterThanSm && <Header />}
       <Grid container spacing={3}>
         <Grid
@@ -35,7 +50,7 @@ function App() {
           <SongPlayer />
         </Grid>
       </Grid>
-    </>
+    </SongContext.Provider>
   );
 }
 
