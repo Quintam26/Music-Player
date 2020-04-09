@@ -4,18 +4,19 @@ import {
   Avatar,
   IconButton,
   makeStyles,
-  useMediaQuery
+  useMediaQuery,
 } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 
-function QueuedSongList() {
-  const greaterThanMd = useMediaQuery(theme => theme.breakpoints.up('md'));
+function QueuedSongList({ queue }) {
+  console.log({ queue });
+  const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
   const song = {
     title: 'Ohne Ditch',
     artist: 'Rammstein',
     thumbnail:
-      'https://images-na.ssl-images-amazon.com/images/I/71sJcYPgkJL._SY355_.jpg'
+      'https://images-na.ssl-images-amazon.com/images/I/71sJcYPgkJL._SY355_.jpg',
   };
 
   return (
@@ -35,11 +36,11 @@ function QueuedSongList() {
 const useStyles = makeStyles({
   avatar: {
     width: 44,
-    height: 44
+    height: 44,
   },
   text: {
     textOverflow: 'elilipsis',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   container: {
     display: 'grid',
@@ -47,12 +48,12 @@ const useStyles = makeStyles({
     gridTemplateColumns: '50px auto 50px',
     gridGap: 12,
     alignItems: 'center',
-    marginTop: 10
+    marginTop: 10,
   },
   songInfoContainer: {
     overflow: 'hidden',
-    whiteSpace: 'nowrap'
-  }
+    whiteSpace: 'nowrap',
+  },
 });
 
 function QueuedSong({ song }) {
